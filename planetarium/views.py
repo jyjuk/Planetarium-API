@@ -91,7 +91,7 @@ class AstronomyShowViewSet(
         return AstronomyShowSerializer
 
     @action(
-        method=["POST"],
+        methods=["POST"],
         detail=True,
         url_path="upload-image",
         permission_classes=[IsAdminUser]
@@ -137,7 +137,7 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
             tickets_available=(
                     F("planetarium_dome__rows")
                     * F("planetarium_dome__seats_in_row")
-                    - Count("tickets")
+                    - Count("ticket")
             )
         )
     )
