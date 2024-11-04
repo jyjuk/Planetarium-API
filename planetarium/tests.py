@@ -143,3 +143,49 @@ class AuthenticatedAstronomyShowApiTest(TestCase):
         }
         res = self.client.post(PLANETARIUM_URL, payload)
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class AdminAstronomyShowApiTest(TestCase):
+    def setUp(self) -> None:
+        self.client = APIClient()
+        self.user = get_user_model().objects.create_user(
+            "admin@admin.com",
+            "password",
+            is_staff=True
+        )
+        self.client.force_authenticate(self.user)
+
+    def test_create_astronomy_show(self):
+        payload = {
+            "title": "Astronomy Show",
+            "description": "Description",
+        }
+        res = self.client.post(PLANETARIUM_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        astronomy_show = AstronomyShow.objects.get(id=res.data["id"])
+        for key in payload.keys():
+            self.assertEqual(payload[key], getattr(astronomy_show, key))
+
+    def test_create_astronomy_show_with_show_theme(self):
+        show_theme1 = ShowTheme.objects.create(name="Show Theme 1")
+        show_theme2 = ShowTheme.objects.create(name="Show Theme 2")
+
+        payload = {
+            "title": "Astronomy Show",
+            "show_theme": [show_theme1.id, show_theme2.id],
+            "description": "Description",
+        }
+        res = self.client.post(PLANETARIUM_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+        astronomy_show = AstronomyShow.objects.get(id=res.data["id"])
+        show_themes = astronomy_show.show_theme.all()
+
+        self.assertEqual(show_themes.count(), 2)
+        self.assertIn(show_theme1, show_themes)
+        self.assertIn(show_theme2, show_themes)
+
+
+
