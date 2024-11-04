@@ -9,7 +9,7 @@ from django.utils.text import slugify
 
 class PlanetariumDome(models.Model):
     name = models.CharField(max_length=255)
-    rows = models.ImageField()
+    rows = models.IntegerField()
     seats_in_row = models.IntegerField()
 
     @property
