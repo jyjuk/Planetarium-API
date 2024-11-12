@@ -32,8 +32,8 @@ def sample_astronomy_show(**params):
 
     astronomy_show = AstronomyShow.objects.create(**defaults)
 
-    if 'show_theme' in params:
-        astronomy_show.show_theme.set(params['show_theme'])
+    if "show_theme" in params:
+        astronomy_show.show_theme.set(params["show_theme"])
 
     return astronomy_show
 
