@@ -9,18 +9,22 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
+import os.path
 from datetime import timedelta
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+from django.template.context_processors import media
+from dotenv import load_dotenv
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
+load_dotenv()
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-@xd^@l6k1or$i@c33!zivi@cp)$9&8l*r6+vo&aywodddyy8)#"
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -85,8 +89,12 @@ WSGI_APPLICATION = "planetarium_api.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.environ["POSTGRES_DB"],
+        "USER": os.environ["POSTGRES_USER"],
+        "PASSWORD": os.environ["POSTGRES_PASSWORD"],
+        "HOST": os.environ["POSTGRES_HOST"],
+        "PORT": os.environ["POSTGRES_PORT"],
     }
 }
 
@@ -120,13 +128,17 @@ TIME_ZONE = "UTC"
 
 USE_I18N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = "static/"
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = "/files/media/"
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -139,14 +151,14 @@ REST_FRAMEWORK = {
         "rest_framework.throttling.AnonRateThrottle",
         "rest_framework.throttling.UserRateThrottle",
     ],
-    "DEFAULT_THROTTLE_RATES": {"anon": "10/day", "user": "30/day"},
+    "DEFAULT_THROTTLE_RATES": {"anon": "10/day", "user": "300/day"},
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": False,
 }
